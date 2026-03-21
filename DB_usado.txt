@@ -1,0 +1,37 @@
+select current_user;
+create schema doc;
+CREATE TABLE doc.usuarios (
+id_usuario Text Default gen_random_uuid() Primary key,
+nombre Varchar(200),
+documento Varchar(50),
+carnet Varchar(50),
+email Varchar(250),
+contrasenia Varchar(50),
+bloqueado char(1),
+ultimo_login Timestamp,
+activo char(1) Default 'A',
+fecha_creacion Timestamp Default now()
+);
+
+
+INSERT INTO doc.usuarios (nombre, documento, carnet, email, contrasenia, bloqueado, ultimo_login, activo)
+VALUES 
+('Juan Pérez', '12345678', 'C001', 'juan.perez@gmail.com', '12345', 'N', now(), 'A'),
+
+('María López', '87654321', 'C002', 'maria.lopez@gmail.com', 'abcde', 'N', now(), 'A'),
+
+('Carlos Martínez', '11223344', 'C003', 'carlos.m@gmail.com', 'pass123', 'N', now(), 'A'),
+
+('Ana Rodríguez', '44332211', 'C004', 'ana.rodriguez@gmail.com', 'clave123', 'S', now(), 'A'),
+
+('Luis Gómez', '55667788', 'C005', 'luis.gomez@gmail.com', 'luis2024', 'N', now(), 'A'),
+
+('Sofía Hernández', '99887766', 'C006', 'sofia.h@gmail.com', 'sofia123', 'N', now(), 'A'),
+
+('Pedro Ramírez', '66778899', 'C007', 'pedro.r@gmail.com', 'pedro123', 'S', now(), 'A'),
+
+('Lucía Torres', '33445566', 'C008', 'lucia.t@gmail.com', 'lucia123', 'N', now(), 'A'),
+
+('Diego Flores', '22334455', 'C009', 'diego.f@gmail.com', 'diego123', 'N', now(), 'A'),
+
+('Valeria Castro', '77889900', 'C010', 'valeria.c@gmail.com', 'valeria123', 'N', now(), 'A');
