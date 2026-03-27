@@ -1,36 +1,23 @@
 //Importamos nuestro pool de conexiones a la BD
 import { pool } from '../db.js';
 
+//Importamos bcryptsj para generrar hashes y comprar contraseñas
+import bcryptjs from 'bcryptjs';
+
 //================================
 //Obtener todos los usuarios
 //================================
-export const getAllUsers = async (req, res) => {
-    try {
-        //Ejecutamos consult sql
-        const result = await pool.query('SELECT * FROM doc.usuarios');
-        //Devolvemos los resultados en formato JSON
-        res.json(result.rows);
-    } catch (err) {
-        //si ocurre un error, devolvemos un mensaje de error
-        res.status(500).json({ error: 'Error al obtener los usuarios' });
-    }
+export const getAllUsers = async () => {
+    const result = await pool.query('SELECT * FROM doc.usuarios');
+    return result.rows; //retorna un array con todos los usuarios
 };
 
 //================================
 //Obtener los usuarios por email
 //================================
-export const getUserByEmail = async (req, res) => {
-    
-    const { email } = req.params;
-    try {
-        //Ejecutamos consult sql
-        const result = await pool.query('SELECT * FROM doc.usuarios WHERE email = $1', [email]);
-        //Devolvemos los resultados en formato JSON
-        res.json(result.rows);
-    } catch (err) {
-        //si ocurre un error, devolvemos un mensaje de error
-        res.status(500).json({ error: err.message });
-    }
+export const getUserByEmail = async (email) => {
+    const result = await pool.query('SELECT * FROM doc.usuarios WHERE email = $1', [email]);
+        return result.rows[0]; //retorna el primer usuario encontrado o null si no se encontro
 };
 
 //================================
@@ -51,23 +38,27 @@ export const getBuscarNombre = async (nombre) => {
 //Creacion de usuario
 //================================
 export const postCrearUsuario = async (nombre, documento, carnet, email, contrasenia) => {
-    try {
+   
+    //Numero de salt rounds (cost), 10 esun valor razonable para desarrollo,
+    const saltRounds = 10;
+    
+    //Generamos el hash de la contraseña utilizando bcryptjs
+    //bcrypt.genSaltSync devuelve el salt de forma sincrona
+    const salt = bcryptjs.genSaltSync(saltRounds);
 
+    //bcrypt.hashSync devuelve el hash de forma sincrona
+    const hashedPassword = bcryptjs.hashSync(contrasenia, salt);
         // Definimos la consulta SQL con parametros
-const query = `INSERT INTO doc.usuarios (nombre, documento, carnet, email, contrasenia, bloqueado, ultimo_login, activo) 
+        const query = `INSERT INTO doc.usuarios (nombre, documento, carnet, email, contrasenia, bloqueado, ultimo_login, activo) 
                VALUES ($1, $2, $3, $4, $5, 'N', null, 'A') RETURNING *`;
 
         //Ejecutamos la consulta SQL utilizando los parametros proporcionados
-        const result = await pool.query(query, [nombre, documento, carnet, email, contrasenia]);
+        const result = await pool.query(query, [nombre, documento, carnet, email, hashedPassword]);
 
         //retorno el nuevo usuario creado 
         return result.rows[0];
 
-    } catch (err) {
-        //si ocurre un error
-        throw err;
-    }
-
+    
 };
 
 
